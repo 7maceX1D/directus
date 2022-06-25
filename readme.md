@@ -112,3 +112,31 @@ team, talented contributors, and amazing [GitHub Sponsors](https://github.com/sp
 <br />
 
 © 2004-2022, Monospace Inc
+
+## Additional Supplementary by 7MaceX1D
+
+Edited `package.json` & generate `clean` command for convenience
+
+About `npm run dev` works
+
+- `npm run build`
+  - dev mode is dependent of `dist` created by `build`
+- Initialize env and db
+  - `cd path/to/directus/api`
+  - `touch .env`
+    - fill config: KEY="", SECRET="", DB_CLIENT="sqlite3", DB_FILENAME="./dev.db"
+  - DB Install: `npm run cli database install`
+    - dev.db created in path/to/directus/api directory
+  - DB Migrate: `npm run cli database migrate:latest`
+  - Admin User Create:
+    - Role: `npm run cli roles create -- --role Administrator --admin`
+      - stdout print this role id (a uuid)
+    - User:
+      `npm run cli users create -- --email admin@example.com --password Admin123 --role ${the uuid of admin role printed in above command}`
+- Run
+  - Open two shells
+    - `cd path/to/directus`
+  - In one shell
+    - `npm run dev -- --scope directus`
+  - In other shell
+    - `npm run dev -- --scope @directus/app`

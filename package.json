@@ -15,6 +15,7 @@
 		"build": "lerna run build",
 		"build:api": "lerna run build --ignore @directus/app",
 		"pack": "node docker/pack",
+		"clean": "node -e \"const { execSync } = require('child_process'); JSON.parse( String( execSync('npx lerna list --json') ) ).map(v => { try { const cmd = 'rm -rf ' + v.location + '/dist'; console.log(cmd); execSync(cmd); } catch(e) {console.log(e)} }); const cmd = 'rm -rf dist'; console.log(cmd); execSync(cmd); \"",
 		"release": "lerna version --force-publish --exact",
 		"test": "lerna run test",
 		"test:e2e": "jest tests -c tests/jest.config.js",
