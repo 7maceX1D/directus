@@ -124,7 +124,13 @@ About `npm run dev` works
 - Initialize env and db
   - `cd path/to/directus/api`
   - `touch .env`
-    - fill config: KEY="", SECRET="", DB_CLIENT="sqlite3", DB_FILENAME="./dev.db"
+    - fill config(db use sqlite):
+      - `KEY=""`
+      - `SECRET=""`
+      - `DB_CLIENT="sqlite3"`
+      - `DB_FILENAME="./dev.db"`
+      - `EXTENSIONS_PATH="./extensions"`
+      - `EXTENSIONS_AUTO_RELOAD=true`
   - DB Install: `npm run cli database install`
     - dev.db created in path/to/directus/api directory
   - DB Migrate: `npm run cli database migrate:latest`
@@ -139,4 +145,4 @@ About `npm run dev` works
   - In one shell
     - `npm run dev -- --scope directus`
   - In other shell
-    - `npm run dev -- --scope @directus/app`
+    - `npm run dev -- --ignore directus`
