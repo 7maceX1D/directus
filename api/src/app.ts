@@ -5,6 +5,8 @@ import path from 'path';
 import qs from 'qs';
 import helmet from 'helmet';
 
+import compression from 'compression';
+
 import activityRouter from './controllers/activity';
 import assetsRouter from './controllers/assets';
 import authRouter from './controllers/auth';
@@ -97,6 +99,11 @@ export default async function createApp(): Promise<express.Application> {
 	app.disable('x-powered-by');
 	app.set('trust proxy', env.IP_TRUST_PROXY);
 	app.set('query parser', (str: string) => qs.parse(str, { depth: 10 }));
+
+	if (env.GZIP_COMPRESSION === true) {
+		logger.info('Use GZIP compression!');
+		app.use(compression());
+	}
 
 	app.use(
 		helmet.contentSecurityPolicy(
