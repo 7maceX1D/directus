@@ -82,6 +82,7 @@
 		"@directus/drive-azure": "9.12.2",
 		"@directus/drive-gcs": "9.12.2",
 		"@directus/drive-s3": "9.12.2",
+		"@directus/drive-aliyun": "9.12.2-base-drive-s3-9.12.2",
 		"@directus/extensions-sdk": "9.12.2",
 		"@directus/format-title": "9.12.2",
 		"@directus/schema": "9.12.2",

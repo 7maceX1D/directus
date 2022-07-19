@@ -2,6 +2,7 @@ import { LocalFileSystemStorage, Storage, StorageManager, StorageManagerConfig }
 import { AzureBlobWebServicesStorage } from '@directus/drive-azure';
 import { GoogleCloudStorage } from '@directus/drive-gcs';
 import { AmazonWebServicesS3Storage } from '@directus/drive-s3';
+import { AliyunWebServicesOSSStorage } from '@directus/drive-aliyun';
 import env from './env';
 import { getConfigFromEnv } from './utils/get-config-from-env';
 import { toArray } from '@directus/shared/utils';
@@ -62,6 +63,8 @@ function getStorageDriver(driver: string) {
 			return LocalFileSystemStorage;
 		case 's3':
 			return AmazonWebServicesS3Storage;
+		case 'aliyunoss':
+			return AliyunWebServicesOSSStorage;
 		case 'gcs':
 			return GoogleCloudStorage;
 		case 'azure':
