@@ -17,6 +17,7 @@ import {
 } from '@directus/drive';
 import path from 'path';
 import normalize from 'normalize-path';
+import { Endpoint } from 'aws-sdk';
 
 function handleError(err: Error, path: string, bucket: string): Error {
 	switch (err.name) {
@@ -36,10 +37,16 @@ export class AmazonWebServicesS3Storage extends Storage {
 	protected $bucket: string;
 	protected $root: string;
 	protected $acl?: string;
+	protected $endpointPublic?: Endpoint;
 
 	constructor(config: AmazonWebServicesS3StorageConfig) {
 		super();
 		const S3 = require('aws-sdk/clients/s3');
+
+		if (config.endpointPublic) {
+			this.$endpointPublic = new Endpoint(config.endpointPublic);
+			delete config.endpointPublic;
+		}
 
 		this.$driver = new S3({
 			accessKeyId: config.key,
@@ -220,10 +227,14 @@ export class AmazonWebServicesS3Storage extends Storage {
 	public getUrl(location: string): string {
 		location = this._fullPath(location);
 
-		const { href } = this.$driver.endpoint;
+		const { href, host, hostname } = this.$endpointPublic || this.$driver.endpoint;
 
 		if (href.startsWith('https://s3.amazonaws')) {
 			return `https://${this.$bucket}.s3.amazonaws.com/${location}`;
+		}
+
+		if (hostname.endsWith('.aliyuncs.com')) {
+			return `https://${this.$bucket}.${host}/${location}`;
 		}
 
 		return `${href}${this.$bucket}/${location}`;
@@ -312,4 +323,5 @@ export interface AmazonWebServicesS3StorageConfig extends ClientConfiguration {
 	bucket: string;
 	root?: string;
 	acl?: string;
+	endpointPublic?: string;
 }

@@ -136,6 +136,15 @@ router.get(
 			  )
 			: res.locals.transformation;
 
+		// added by 7macex1d for aliyun support
+		if (env.ASSETS_USE_REMOTE_TRANSFORMER) {
+			const { url } = await service.getUrl(id, transformation);
+			if (url) {
+				res.redirect(url);
+				return;
+			}
+		}
+
 		let range: Range | undefined = undefined;
 
 		if (req.headers.range) {

@@ -14,6 +14,7 @@ import { Accountability } from '@directus/shared/types';
 import { AuthorizationService } from './authorization';
 import * as TransformationUtils from '../utils/transformations';
 import validateUUID from 'uuid-validate';
+import { URLSearchParams } from 'url';
 
 sharp.concurrency(1);
 
@@ -168,9 +169,152 @@ export class AssetsService {
 			return { stream: readStream, file, stat };
 		}
 	}
+
+	async getUrl(
+		id: string,
+		transformation: TransformationParams | TransformationPreset
+	): Promise<{ url: string; file: any }> {
+		const publicSettings = await this.knex
+			.select('project_logo', 'public_background', 'public_foreground')
+			.from('directus_settings')
+			.first();
+
+		const systemPublicKeys = Object.values(publicSettings || {});
+
+		/**
+		 * This is a little annoying. Postgres will error out if you're trying to search in `where`
+		 * with a wrong type. In case of directus_files where id is a uuid, we'll have to verify the
+		 * validity of the uuid ahead of time.
+		 */
+		const isValidUUID = validateUUID(id, 4);
+
+		if (isValidUUID === false) throw new ForbiddenException();
+
+		if (systemPublicKeys.includes(id) === false && this.accountability?.admin !== true) {
+			await this.authorizationService.checkAccess('read', 'directus_files', id);
+		}
+
+		const file = (await this.knex.select('*').from('directus_files').where({ id }).first()) as File;
+
+		if (!file) throw new ForbiddenException();
+
+		if (storage.getDriverName(file.storage) != 'aliyunoss') {
+			return { url: '', file: null };
+		}
+
+		// const resp = await storage.disk(file.storage).getSignedUrl(file.filename_disk);
+		// const url = resp.signedUrl;
+		let url = storage.disk(file.storage).getUrl(file.filename_disk);
+
+		const type = file.type;
+		const transforms = TransformationUtils.resolvePreset(transformation, file);
+		if (type && transforms.length > 0 && ['image/jpeg', 'image/png', 'image/webp', 'image/tiff'].includes(type)) {
+			// console.log('AssetsService.getUrl: ', file, id, url, type, transforms, transformation);
+			url = addAliyunOSSImageProcessParamsToURL(url, transforms);
+
+			if (!url) {
+				const maybeNewFormat = TransformationUtils.maybeExtractFormat(transforms);
+
+				const assetFilename =
+					path.basename(file.filename_disk, path.extname(file.filename_disk)) +
+					getAssetSuffix(transforms) +
+					(maybeNewFormat ? `.${maybeNewFormat}` : path.extname(file.filename_disk));
+
+				const { exists } = await storage.disk(file.storage).exists(assetFilename);
+
+				if (maybeNewFormat) {
+					file.type = contentType(assetFilename) || null;
+				}
+
+				if (exists) {
+					return {
+						url: storage.disk(file.storage).getUrl(assetFilename),
+						file,
+					};
+				}
+
+				// Check image size before transforming. Processing an image that's too large for the
+				// system memory will kill the API. Sharp technically checks for this too in it's
+				// limitInputPixels, but we should have that check applied before starting the read streams
+				const { width, height } = file;
+
+				if (
+					!width ||
+					!height ||
+					width > env.ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION ||
+					height > env.ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION
+				) {
+					throw new IllegalAssetTransformation(
+						`Image is too large to be transformed, or image size couldn't be determined.`
+					);
+				}
+
+				return await semaphore.runExclusive(async () => {
+					const readStream = storage.disk(file.storage).getStream(file.filename_disk);
+					const transformer = sharp({
+						limitInputPixels: Math.pow(env.ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION, 2),
+						sequentialRead: true,
+					}).rotate();
+
+					transforms.forEach(([method, ...args]) => (transformer[method] as any).apply(transformer, args));
+
+					await storage.disk(file.storage).put(assetFilename, readStream.pipe(transformer), type);
+
+					return {
+						url: storage.disk(file.storage).getUrl(assetFilename),
+						file,
+					};
+				});
+			}
+		}
+
+		return { url, file };
+	}
 }
 
 const getAssetSuffix = (transforms: Transformation[]) => {
 	if (Object.keys(transforms).length === 0) return '';
 	return `__${hash(transforms)}`;
+};
+
+const addAliyunOSSImageProcessParamsToURL = (url: string, transforms: Transformation[]): string => {
+	let process = '';
+	for (const t of transforms) {
+		const [method, args] = t;
+		let cmd = '';
+		switch (method) {
+			case 'resize':
+				cmd += 'resize';
+				switch (args.fit) {
+					case 'contain':
+						cmd += ',m_lfit';
+						break;
+					case 'cover':
+						cmd += ',m_fill';
+						break;
+					case 'inside':
+						cmd += ',m_lfit';
+						break;
+					case 'outside':
+						cmd += ',mfit';
+						break;
+					case 'fill':
+						cmd += ',fill';
+						break;
+					default:
+						return '';
+				}
+				if (args.width) cmd += `,w_${args.width}`;
+				if (args.height) cmd += `,h_${args.height}`;
+				break;
+			default:
+				return '';
+		}
+		process = process + '/' + cmd;
+	}
+	if (!process) return url;
+
+	const queryParams = new URLSearchParams(url.split('?')[1] || '');
+	queryParams.set('x-oss-process', 'image' + process);
+	return url.split('?')[0] + '?' + queryParams;
 };

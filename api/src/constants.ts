@@ -9,23 +9,23 @@ export const SYSTEM_ASSET_ALLOW_LIST: TransformationParams[] = [
 	},
 	{
 		key: 'system-small-contain',
-		transforms: [['resize', { width: 64, fit: 'contain' }]],
+		transforms: [['resize', { width: 64, height: 64, fit: 'inside' }]],
 	},
 	{
 		key: 'system-medium-cover',
-		transforms: [['resize', { width: 300, height: 300, fit: 'cover' }]],
+		transforms: [['resize', { width: 300, height: 300, fit: 'cover', withoutEnlargement: true }]],
 	},
 	{
 		key: 'system-medium-contain',
-		transforms: [['resize', { width: 300, fit: 'contain' }]],
+		transforms: [['resize', { width: 300, height: 300, fit: 'inside', withoutEnlargement: true }]],
 	},
 	{
 		key: 'system-large-cover',
-		transforms: [['resize', { width: 800, height: 800, fit: 'cover' }]],
+		transforms: [['resize', { width: 800, height: 800, fit: 'cover', withoutEnlargement: true }]],
 	},
 	{
 		key: 'system-large-contain',
-		transforms: [['resize', { width: 800, fit: 'contain' }]],
+		transforms: [['resize', { width: 800, height: 800, fit: 'inside', withoutEnlargement: true }]],
 	},
 ];
 
@@ -38,6 +38,7 @@ export const ASSET_TRANSFORM_QUERY_KEYS = [
 	'fit',
 	'quality',
 	'withoutEnlargement',
+	'background',
 ];
 
 export const FILTER_VARIABLES = ['$NOW', '$CURRENT_USER', '$CURRENT_ROLE'];

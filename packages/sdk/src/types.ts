@@ -94,6 +94,7 @@ export type SettingType = SystemType<{
 				quality: number;
 				key: string;
 				withoutEnlargement: boolean;
+				background: string;
 		  }[]
 		| null;
 	storage_asset_transform: 'none' | 'all' | 'presets';

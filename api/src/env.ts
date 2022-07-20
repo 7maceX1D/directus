@@ -83,6 +83,7 @@ const allowedEnvironmentVars = [
 	'STORAGE_.+_BUCKET',
 	'STORAGE_.+_REGION',
 	'STORAGE_.+_ENDPOINT',
+	'STORAGE_.+_ENDPOINT_PUBLIC', // added by 7macex1d for distinguish between aliyun public and internal endpoint
 	'STORAGE_.+_ACL',
 	'STORAGE_.+_CONTAINER_NAME',
 	'STORAGE_.+_ACCOUNT_NAME',
@@ -94,6 +95,7 @@ const allowedEnvironmentVars = [
 	'FILE_METADATA_ALLOW_LIST',
 	// assets
 	'ASSETS_CACHE_TTL',
+	'ASSETS_USE_REMOTE_TRANSFORMER', // added by 7macex1d for aliyun transformer
 	'ASSETS_TRANSFORM_MAX_CONCURRENT',
 	'ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION',
 	'ASSETS_TRANSFORM_MAX_OPERATIONS',
@@ -221,6 +223,7 @@ const defaults: Record<string, any> = {
 	TELEMETRY: true,
 
 	ASSETS_CACHE_TTL: '30d',
+	ASSETS_USE_REMOTE_TRANSFORMER: false,
 	ASSETS_TRANSFORM_MAX_CONCURRENT: 1,
 	ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION: 6000,
 	ASSETS_TRANSFORM_MAX_OPERATIONS: 5,

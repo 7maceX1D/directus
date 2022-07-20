@@ -62,6 +62,8 @@ function getStorageDriver(driver: string) {
 			return LocalFileSystemStorage;
 		case 's3':
 			return AmazonWebServicesS3Storage;
+		case 'aliyunoss':
+			return AmazonWebServicesS3Storage;
 		case 'gcs':
 			return GoogleCloudStorage;
 		case 'azure':

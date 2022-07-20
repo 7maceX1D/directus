@@ -105,4 +105,34 @@ export default class StorageManager {
 	registerDriver<T extends Storage>(name: string, driver: StorageConstructor<T>): void {
 		this._drivers.set(name, driver);
 	}
+
+	getDriverName(name?: string): string {
+		name = name || this.defaultDisk;
+
+		/**
+		 * No name is defined and neither there
+		 * are any defaults.
+		 */
+		if (!name) {
+			throw InvalidConfig.missingDiskName();
+		}
+
+		const diskConfig = this.disksConfig[name];
+
+		/**
+		 * Configuration for the defined disk is missing
+		 */
+		if (!diskConfig) {
+			throw InvalidConfig.missingDiskConfig(name);
+		}
+
+		/**
+		 * There is no driver defined on disk configuration
+		 */
+		if (!diskConfig.driver) {
+			throw InvalidConfig.missingDiskDriver(name);
+		}
+
+		return diskConfig.driver;
+	}
 }
