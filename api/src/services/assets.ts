@@ -9,7 +9,14 @@ import getDatabase from '../database';
 import env from '../env';
 import { IllegalAssetTransformation, RangeNotSatisfiableException, ForbiddenException } from '../exceptions';
 import storage from '../storage';
-import { AbstractServiceOptions, File, Transformation, TransformationParams, TransformationPreset } from '../types';
+import {
+	AbstractServiceOptions,
+	File,
+	Transformation,
+	TransformationParams,
+	TransformationPreset,
+	TransformationPresetResize,
+} from '../types';
 import { Accountability } from '@directus/shared/types';
 import { AuthorizationService } from './authorization';
 import * as TransformationUtils from '../utils/transformations';
@@ -281,36 +288,40 @@ const addAliyunOSSImageProcessParamsToURL = (url: string, transforms: Transforma
 	let process = '';
 	for (const t of transforms) {
 		const [method, args] = t;
-		let cmd = '';
-		switch (method) {
-			case 'resize':
-				cmd += 'resize';
-				switch (args.fit) {
-					case 'contain':
-						cmd += ',m_lfit';
-						break;
-					case 'cover':
-						cmd += ',m_fill';
-						break;
-					case 'inside':
-						cmd += ',m_lfit';
-						break;
-					case 'outside':
-						cmd += ',mfit';
-						break;
-					case 'fill':
-						cmd += ',fill';
-						break;
-					default:
-						return '';
+		if (method && args) {
+			let cmd = '';
+			switch (method) {
+				case 'resize': {
+					const options = args as sharp.ResizeOptions;
+					cmd += 'resize';
+					switch (options.fit) {
+						case 'contain':
+							cmd += ',m_lfit';
+							break;
+						case 'cover':
+							cmd += ',m_fill';
+							break;
+						case 'inside':
+							cmd += ',m_lfit';
+							break;
+						case 'outside':
+							cmd += ',mfit';
+							break;
+						case 'fill':
+							cmd += ',fill';
+							break;
+						default:
+							return '';
+					}
+					if (options.width) cmd += `,w_${options.width}`;
+					if (options.height) cmd += `,h_${options.height}`;
+					break;
 				}
-				if (args.width) cmd += `,w_${args.width}`;
-				if (args.height) cmd += `,h_${args.height}`;
-				break;
-			default:
-				return '';
+				default:
+					return '';
+			}
+			process = process + '/' + cmd;
 		}
-		process = process + '/' + cmd;
 	}
 	if (!process) return url;
 
