@@ -217,7 +217,12 @@ export class AssetsService {
 		const transforms = TransformationUtils.resolvePreset(transformation, file);
 		if (type && transforms.length > 0 && ['image/jpeg', 'image/png', 'image/webp', 'image/tiff'].includes(type)) {
 			// console.log('AssetsService.getUrl: ', file, id, url, type, transforms, transformation);
-			url = addAliyunOSSImageProcessParamsToURL(url, transforms);
+			if (file.filesize < 20971520) {
+				// Image process error with 'Maximal size of image supported is 20971520' message from aliyun
+				url = addAliyunOSSImageProcessParamsToURL(url, transforms);
+			} else {
+				url = '';
+			}
 
 			if (!url) {
 				const maybeNewFormat = TransformationUtils.maybeExtractFormat(transforms);
