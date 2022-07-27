@@ -1546,6 +1546,9 @@ interfaces:
     description: Select or upload an image
     crop: Crop to Fit
     crop_label: Crop image as needed
+  file-video:
+    video: Video
+    description: Select or upload an video
   system-interface:
     interface: Interface
     description: Select an existing interface
