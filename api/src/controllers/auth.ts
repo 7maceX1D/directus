@@ -81,6 +81,18 @@ router.post(
 			data: { access_token: accessToken, expires },
 		} as Record<string, Record<string, any>>;
 
+		if (env.ACCESS_TOKEN_COOKIE_ENABLE) {
+			res.cookie(env.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
+				httpOnly: true,
+				domain: env.ACCESS_TOKEN_COOKIE_DOMAIN,
+				maxAge: ms(env.ACCESS_TOKEN_TTL as string),
+				secure: env.ACCESS_TOKEN_COOKIE_SECURE ?? false,
+			});
+			logger.info(
+				`AUTH: Access Token is set in Cookie -> ${env.ACCESS_TOKEN_COOKIE_NAME} of ${env.ACCESS_TOKEN_COOKIE_DOMAIN} in ${env.ACCESS_TOKEN_TTL}`
+			);
+		}
+
 		if (mode === 'json') {
 			payload.data.refresh_token = refreshToken;
 		}
@@ -130,6 +142,17 @@ router.post(
 				secure: env.REFRESH_TOKEN_COOKIE_SECURE ?? false,
 				sameSite: (env.REFRESH_TOKEN_COOKIE_SAME_SITE as 'lax' | 'strict' | 'none') || 'strict',
 			});
+		}
+
+		if (req.cookies[env.ACCESS_TOKEN_COOKIE_NAME]) {
+			res.clearCookie(env.ACCESS_TOKEN_COOKIE_NAME, {
+				httpOnly: true,
+				domain: env.ACCESS_TOKEN_COOKIE_DOMAIN,
+				secure: env.ACCESS_TOKEN_COOKIE_SECURE ?? false,
+			});
+			logger.info(
+				`AUTH: Access Token is delete in Cookie -> ${env.ACCESS_TOKEN_COOKIE_NAME} of ${env.ACCESS_TOKEN_COOKIE_DOMAIN}`
+			);
 		}
 
 		return next();

@@ -111,10 +111,18 @@ export default defineComponent({
 
 				const redirectQuery = router.currentRoute.value.query.redirect as string;
 
-				// Stores are hydrated after login
-				const lastPage = userStore.currentUser?.last_page;
+				// edited by 7macex1d
+				// try to redirect page or router by http protocal
+				if (redirectQuery.startsWith('http')) {
+					setTimeout(() => {
+						document.location.href = redirectQuery;
+					}, 1000);
+				} else {
+					// Stores are hydrated after login
+					const lastPage = userStore.currentUser?.last_page;
 
-				router.push(redirectQuery || lastPage || '/content');
+					router.push(redirectQuery || lastPage || '/content');
+				}
 			} catch (err: any) {
 				if (err.response?.data?.errors?.[0]?.extensions?.code === 'INVALID_OTP' && requiresTFA.value === false) {
 					requiresTFA.value = true;

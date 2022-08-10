@@ -10,6 +10,8 @@ import env from '../../env';
 import { respond } from '../../middleware/respond';
 import { COOKIE_OPTIONS } from '../../constants';
 import { getIPFromReq } from '../../utils/get-ip-from-req';
+import logger from '../../logger';
+import ms from 'ms';
 
 export class LocalAuthDriver extends AuthDriver {
 	async getUserID(payload: Record<string, any>): Promise<string> {
@@ -82,6 +84,18 @@ export function createLocalAuthRouter(provider: string): Router {
 			const payload = {
 				data: { access_token: accessToken, expires },
 			} as Record<string, Record<string, any>>;
+
+			if (env.ACCESS_TOKEN_COOKIE_ENABLE) {
+				res.cookie(env.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
+					httpOnly: true,
+					domain: env.ACCESS_TOKEN_COOKIE_DOMAIN,
+					maxAge: ms(env.ACCESS_TOKEN_TTL as string),
+					secure: env.ACCESS_TOKEN_COOKIE_SECURE ?? false,
+				});
+				logger.info(
+					`AUTH: Access Token is set in Cookie -> ${env.ACCESS_TOKEN_COOKIE_NAME} of ${env.ACCESS_TOKEN_COOKIE_DOMAIN} in ${env.ACCESS_TOKEN_TTL}`
+				);
+			}
 
 			if (mode === 'json') {
 				payload.data.refresh_token = refreshToken;

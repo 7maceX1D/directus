@@ -71,7 +71,20 @@ export default defineComponent({
 
 		async function hydrateAndLogin() {
 			await hydrate();
-			router.push(lastPage.value || `/content`);
+
+			// edited by 7macex1d
+			// try to redirect page or router by http protocal
+			const currentURL = new URL(document.location.href);
+			const redirect = currentURL.searchParams.get('redirect');
+			if (redirect) {
+				if (redirect.startsWith('http')) {
+					document.location.href = redirect;
+				} else {
+					router.push(redirect);
+				}
+			} else {
+				router.push(lastPage.value || `/content`);
+			}
 		}
 	},
 });
