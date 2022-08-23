@@ -122,6 +122,18 @@
 			</v-dialog>
 
 			<v-button
+				v-if="!isNew && previewURL"
+				v-tooltip.bottom="t('preview')"
+				rounded
+				icon
+				:disabled="isSavable"
+				style="display: inherit !important"
+				@click="openPreview"
+			>
+				<v-icon name="preview" />
+			</v-button>
+
+			<v-button
 				v-tooltip.bottom="saveAllowed ? t('save') : t('not_allowed')"
 				rounded
 				icon
@@ -221,12 +233,13 @@ import FlowSidebarDetail from '@/views/private/components/flow-sidebar-detail.vu
 import useItem from '@/composables/use-item';
 import SaveOptions from '@/views/private/components/save-options';
 import useShortcut from '@/composables/use-shortcut';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { usePermissions } from '@/composables/use-permissions';
 import useEditsGuard from '@/composables/use-edits-guard';
 import { useTitle } from '@/composables/use-title';
 import { renderStringTemplate } from '@/utils/render-string-template';
 import useTemplateData from '@/composables/use-template-data';
+import { useSettingsStore } from '@/stores/';
 
 export default defineComponent({
 	name: 'ContentsItem',
@@ -256,7 +269,19 @@ export default defineComponent({
 	setup(props) {
 		const { t, te } = useI18n();
 
+		// add by 7macex1d for preview
+		const route = useRoute();
+
 		const router = useRouter();
+
+		// add by 7macex1d for preview
+		const settingStore = useSettingsStore();
+		const previewURL = computed<string | undefined>(() => {
+			if (settingStore.settings?.project_url) {
+				return `${settingStore.settings?.project_url}/preview-from-admin${route.path}`;
+			}
+			return undefined;
+		});
 
 		const form = ref<HTMLElement>();
 
@@ -382,7 +407,10 @@ export default defineComponent({
 
 		return {
 			t,
+			route,
 			router,
+			settingStore,
+			previewURL,
 			item,
 			loading,
 			error,
@@ -399,6 +427,7 @@ export default defineComponent({
 			deleting,
 			archiving,
 			disabledOptions,
+			openPreview,
 			saveAndStay,
 			saveAndAddNew,
 			saveAsCopyAndNavigate,
@@ -442,12 +471,40 @@ export default defineComponent({
 			return { breadcrumb };
 		}
 
+		// add by 7macex1d for quit
+		function quitByMode(defaultAction: () => void) {
+			switch (route.query['quit']) {
+				case 'back':
+					if (router.options.history.state.back) {
+						router.back();
+						return;
+					}
+					break;
+				case 'preview':
+					if (previewURL.value) {
+						openPreview();
+						return;
+					}
+					break;
+			}
+			defaultAction && defaultAction();
+		}
+
+		// add by 7macex1d for preview
+		async function openPreview() {
+			if (previewURL.value) {
+				window.open(previewURL.value, '_self');
+			}
+		}
+
 		async function saveAndQuit() {
 			if (isSavable.value === false) return;
 
 			try {
 				await save();
-				if (props.singleton === false) router.push(`/content/${props.collection}`);
+				quitByMode(() => {
+					if (props.singleton === false) router.push(`/content/${props.collection}`);
+				});
 			} catch {
 				// Save shows unexpected error dialog
 			}
@@ -499,7 +556,9 @@ export default defineComponent({
 			try {
 				await remove();
 				edits.value = {};
-				router.replace(`/content/${props.collection}`);
+				quitByMode(() => {
+					router.replace(`/content/${props.collection}`);
+				});
 			} catch {
 				// `remove` will show the unexpected error dialog
 			}

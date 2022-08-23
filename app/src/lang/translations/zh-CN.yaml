@@ -1306,6 +1306,7 @@ revisions: 修订版本
 no_revisions: 尚未更新
 revert: 还原
 save: 保存
+preview: 预览
 schema: Schema
 search: 搜索
 select_existing: 选择现有

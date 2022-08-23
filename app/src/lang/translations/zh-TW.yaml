@@ -687,6 +687,7 @@ reset: 重設
 reset_password: 重設密碼
 revert: 復原
 save: 儲存
+preview: 預覽
 schema: 架構
 search: 搜尋
 select_existing: 選擇現有的
