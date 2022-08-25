@@ -1,6 +1,6 @@
 {
 	"name": "directus",
-	"version": "9.12.2-r14",
+	"version": "9.12.2-r15",
 	"license": "GPL-3.0-only",
 	"homepage": "https://github.com/directus/directus#readme",
 	"description": "Directus is a real-time API and App dashboard for managing SQL database content.",
@@ -77,7 +77,7 @@
 	],
 	"dependencies": {
 		"@aws-sdk/client-ses": "^3.40.0",
-		"@directus/app": "9.12.2-r14",
+		"@directus/app": "9.12.2-r15",
 		"@directus/drive": "9.12.2-r04",
 		"@directus/drive-azure": "9.12.2",
 		"@directus/drive-gcs": "9.12.2",

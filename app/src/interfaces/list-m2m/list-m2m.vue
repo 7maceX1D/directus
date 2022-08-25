@@ -31,7 +31,7 @@
 						<v-icon v-if="allowDrag" name="drag_handle" class="drag-handle" left @click.stop="() => {}" />
 						<render-template
 							:collection="relationInfo.junctionCollection.collection"
-							:item="element"
+							:item="getFulfilledDisplayItem(element)"
 							:template="templateWithDefaults"
 						/>
 						<div class="spacer" />
@@ -86,14 +86,16 @@ import { parseFilter } from '@/utils/parse-filter';
 import { Filter } from '@directus/shared/types';
 import { deepMap, getFieldsFromTemplate } from '@directus/shared/utils';
 import { render } from 'micromustache';
-import { computed, inject, ref, toRefs } from 'vue';
+import { computed, inject, ref, toRefs, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import api from '@/api';
+import { unexpectedError } from '@/utils/unexpected-error';
 import DrawerItem from '@/views/private/components/drawer-item';
 import DrawerCollection from '@/views/private/components/drawer-collection';
 import Draggable from 'vuedraggable';
 import adjustFieldsForDisplays from '@/utils/adjust-fields-for-displays';
-import { isEmpty, get, clamp } from 'lodash';
-import { usePermissionsStore, useUserStore } from '@/stores';
+import { isEmpty, get, clamp, Collection, cloneDeep } from 'lodash';
+import { usePermissionsStore, useUserStore, useRelationsStore } from '@/stores';
 import { addRelatedPrimaryKeyToFields } from '@/utils/add-related-primary-key-to-fields';
 
 const props = withDefaults(
@@ -136,6 +138,7 @@ const templateWithDefaults = computed(() => {
 	if (!relationInfo.value) return null;
 
 	if (props.template) return props.template;
+
 	if (relationInfo.value.junctionCollection.meta?.display_template)
 		return relationInfo.value.junctionCollection.meta?.display_template;
 
@@ -151,7 +154,6 @@ const templateWithDefaults = computed(() => {
 
 			relatedDisplayTemplate = relatedDisplayTemplate.replace(part, newPart);
 		}
-
 		return relatedDisplayTemplate;
 	}
 
@@ -265,6 +267,106 @@ function deleteItem(item: DisplayItem) {
 	}
 
 	remove(item);
+}
+
+// added by 7macex1d for m2m fulfill display value of 'created' in depth of 2 levels
+const { getFulfilledDisplayItem } = fix2FulfillDisplayAsNull();
+function fix2FulfillDisplayAsNull() {
+	const relationsStore = useRelationsStore();
+	const fulfilledDisplayItems = ref<DisplayItem[]>(cloneDeep(displayItems.value));
+	function getFulfilledDisplayItem(item: DisplayItem) {
+		const index = displayItems.value.indexOf(item);
+		if (index != undefined && index >= 0) {
+			const fulfilledItem = fulfilledDisplayItems.value[index];
+			return fulfilledItem;
+		} else {
+			return item;
+		}
+	}
+	watch(
+		displayItems,
+		(items: DisplayItem[], oldItems: DisplayItem[]) => {
+			if (
+				items == oldItems ||
+				(items && oldItems && items.length == oldItems.length) ||
+				JSON.stringify(items) == JSON.stringify(oldItems)
+			) {
+				return;
+			} else {
+				if (items && items.length > 0) fulfillDisplayItemsForRender(items);
+			}
+		},
+		{ immediate: true }
+	);
+	async function fulfillDisplayItemsForRender(items: DisplayItem[]) {
+		const fulfilledItems = [];
+		for await (const item of items) {
+			const fulfilledItem = await fulfillItemForRender(item);
+			fulfilledItems.push(fulfilledItem);
+		}
+		fulfilledDisplayItems.value = fulfilledItems;
+	}
+	function checkIfNonFulfill(item: DisplayItem) {
+		const nonFulfillCheck = [] as { paths: string[]; fetchCollection: string; fetchPrimaryKey: string }[];
+		if (relationInfo.value) {
+			const relatedItem = item[relationInfo.value.junctionField.field];
+			if (relatedItem) {
+				const relatedCollection = relationInfo.value.relatedCollection;
+				const relatedFieldKeys = Object.keys(relatedItem);
+				for (const fieldKey of relatedFieldKeys) {
+					const relations = relationsStore.getRelationsForField(relatedCollection.collection, fieldKey);
+					if (relations && relations.length > 0 && typeof relatedItem[fieldKey] != 'object') {
+						const fieldRelatedCollection = relations[0].related_collection;
+						if (fieldRelatedCollection) {
+							const foreignKey = fieldKey;
+							const foreignKeyValue = relatedItem[foreignKey];
+							// const fieldRelatedData = await fetchItem(fieldRelatedCollection, foreignKeyValue);
+							// relatedItem[fieldKey] = fieldRelatedData;
+							nonFulfillCheck.push({
+								paths: [relationInfo.value.junctionField.field, fieldKey],
+								fetchCollection: fieldRelatedCollection,
+								fetchPrimaryKey: foreignKeyValue,
+							});
+						}
+					}
+				}
+			}
+		}
+		return nonFulfillCheck;
+	}
+	async function fulfillItemForRender(item: DisplayItem) {
+		const checkResults = checkIfNonFulfill(item);
+		if (checkResults.length > 0) {
+			let itemForRender = cloneDeep(item);
+			for await (const result of checkResults) {
+				const fulfilled = await fetchItem(result.fetchCollection, result.fetchPrimaryKey);
+				switch (result.paths.length) {
+					case 1:
+						itemForRender[result.paths[0]] = fulfilled;
+						break;
+					case 2:
+						itemForRender[result.paths[0]][result.paths[1]] = fulfilled;
+						break;
+				}
+			}
+			return itemForRender;
+		}
+		return item;
+		async function fetchItem(collection: string, primaryKey: string) {
+			const endpoint = collection.startsWith('directus_')
+				? `/${collection.substring(9)}/${primaryKey}`
+				: `/items/${collection}/${encodeURIComponent(primaryKey)}`;
+			try {
+				const response = await api.get(endpoint, { params: { fields: '*' } });
+				return response.data.data;
+			} catch (err: any) {
+				unexpectedError(err);
+			}
+			return undefined;
+		}
+	}
+
+	return { getFulfilledDisplayItem };
 }
 
 const values = inject('values', ref<Record<string, any>>({}));
