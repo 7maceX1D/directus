@@ -738,8 +738,10 @@ interfaces:
     icon: 圖示
   file-image:
     image: 圖像
+    upload: 從裝置上傳圖像
   file-video:
     video: 視訊
+    upload: 從裝置上傳視訊
   system-interface:
     interface: 介面
   select-dropdown-m2o:

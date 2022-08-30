@@ -1454,9 +1454,11 @@ interfaces:
     description: 选择或上传图片
     crop: 裁剪为适合的
     crop_label: 视需要裁剪图像
+    upload: 从设备中上传图片
   file-video:
     video: 视频
     description: 选择或上传视频
+    upload: 从设备中上传视频
   system-interface:
     interface: 接口
     description: 选择一个现有接口

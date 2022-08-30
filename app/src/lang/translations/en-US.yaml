@@ -1547,9 +1547,11 @@ interfaces:
     description: Select or upload an image
     crop: Crop to Fit
     crop_label: Crop image as needed
+    upload: Upload an image from Device
   file-video:
     video: Video
     description: Select or upload an video
+    upload: Upload an video from Device
   system-interface:
     interface: Interface
     description: Select an existing interface

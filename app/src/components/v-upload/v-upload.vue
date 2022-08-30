@@ -28,7 +28,7 @@
 		<template v-else>
 			<p class="type-label">{{ t('drag_file_here') }}</p>
 			<p class="type-text">{{ t('click_to_browse') }}</p>
-			<input class="browse" type="file" :multiple="multiple" @input="onBrowseSelect" />
+			<input class="browse" type="file" :accept="$props.acceptMimetype" :multiple="multiple" @input="onBrowseSelect" />
 
 			<template v-if="fromUrl !== false || fromLibrary !== false">
 				<v-menu show-arrow placement="bottom-end">
@@ -111,6 +111,10 @@ export default defineComponent({
 		fileId: {
 			type: String,
 			default: null,
+		},
+		acceptMimetype: {
+			type: String,
+			default: '*',
 		},
 		fromUrl: {
 			type: Boolean,
