@@ -75,11 +75,32 @@ export default defineComponent({
 			// edited by 7macex1d
 			// try to redirect page or router by http protocal
 			const currentURL = new URL(document.location.href);
+			const authorizeCallback = currentURL.searchParams.get('authorizeCallback');
+			if (authorizeCallback) {
+				// TODO: should check this callback url is avaiable to redirect!!!
+				const callback = new URL(authorizeCallback);
+				const accessToken = api.defaults.headers.common['Authorization']?.split(' ')[1];
+				if (accessToken) {
+					const params = new URLSearchParams(callback.search);
+					params.set('access_token', accessToken);
+					callback.search = params.toString();
+					try {
+						document.location.href = callback.toString();
+					} catch (err: any) {
+						unexpectedError(err);
+					}
+					return;
+				}
+			}
 			const redirect = currentURL.searchParams.get('redirect');
 			if (redirect) {
-				if (redirect.startsWith('http')) {
-					document.location.href = redirect;
-				} else {
+				try {
+					if (new URL(redirect).protocol) {
+						document.location.href = redirect;
+					} else {
+						router.push(redirect);
+					}
+				} catch (e) {
 					router.push(redirect);
 				}
 			} else {
