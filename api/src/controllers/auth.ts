@@ -15,6 +15,7 @@ import {
 } from '../auth/drivers';
 import { DEFAULT_AUTH_PROVIDER } from '../constants';
 import { getIPFromReq } from '../utils/get-ip-from-req';
+import { COOKIE_OPTIONS } from '../constants';
 
 const router = Router();
 
@@ -59,6 +60,7 @@ router.post(
 		const accountability = {
 			ip: getIPFromReq(req),
 			userAgent: req.get('user-agent'),
+			origin: req.get('origin'),
 			role: null,
 		};
 
@@ -98,13 +100,7 @@ router.post(
 		}
 
 		if (mode === 'cookie') {
-			res.cookie(env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
-				httpOnly: true,
-				domain: env.REFRESH_TOKEN_COOKIE_DOMAIN,
-				maxAge: ms(env.REFRESH_TOKEN_TTL as string),
-				secure: env.REFRESH_TOKEN_COOKIE_SECURE ?? false,
-				sameSite: (env.REFRESH_TOKEN_COOKIE_SAME_SITE as 'lax' | 'strict' | 'none') || 'strict',
-			});
+			res.cookie(env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, COOKIE_OPTIONS);
 		}
 
 		res.locals.payload = payload;
@@ -119,6 +115,7 @@ router.post(
 		const accountability = {
 			ip: getIPFromReq(req),
 			userAgent: req.get('user-agent'),
+			origin: req.get('origin'),
 			role: null,
 		};
 
@@ -170,6 +167,7 @@ router.post(
 		const accountability = {
 			ip: getIPFromReq(req),
 			userAgent: req.get('user-agent'),
+			origin: req.get('origin'),
 			role: null,
 		};
 
@@ -204,6 +202,7 @@ router.post(
 		const accountability = {
 			ip: getIPFromReq(req),
 			userAgent: req.get('user-agent'),
+			origin: req.get('origin'),
 			role: null,
 		};
 

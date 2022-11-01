@@ -187,6 +187,8 @@ revision_post_create: Oto jak wyglądał ten przedmiot podczas jego tworzenia.
 revision_post_update: Oto jak wyglądał ten element po aktualizacji.
 changes_made: Poniżej przedstawiono konkretne zmiany wprowadzone w tej rewizji.
 no_relational_data: Należy pamiętać, że nie uwzględniono tu danych dotyczących relacji.
+top: Góra
+bottom: Dolny
 hide_field: Ukryj pole
 hide_field_on_detail: Ukryj pole w szczegółach
 show_field_on_detail: Pokaż pole w szczegółach
@@ -295,6 +297,8 @@ next: Następny
 field_name: Nazwa pola
 translations: Tłumaczenia
 no_translations: Brak tłumaczeń
+left_to_right: Od lewej do prawej
+right_to_left: Od prawej do lewej
 note: Notatka
 enter_a_value: Wprowadź wartość...
 enter_a_placeholder: Wprowadź tekst zastępczy...
@@ -309,6 +313,7 @@ primary_key: Klucz podstawowy
 foreign_key: Klucz obcy
 finish_setup: Zakończ konfigurację
 dismiss: Anuluj
+toggle_raw_editor: Przełącz edytor
 raw_value: Wartość surowa
 copy_raw_value: Kopiuj wartość surową
 copy_raw_value_success: Skopiowano
@@ -321,6 +326,7 @@ edit_raw_value: Edytuj wartość surową
 enter_raw_value: Wprowadź surową wartość...
 clear_value: Wyczyść wartość
 clear_changes: Wyczyść zmiany
+clear_items: Wyczyść elementy
 reset_to_default: Przywróć domyślne
 undo_changes: Cofnij zmiany
 notifications: Powiadomienia
@@ -337,6 +343,7 @@ revision_delta_created_externally: Utworzono zewnętrznie
 revision_delta_updated: 'Zaktualizowano 1 pole | Zaktualizowano {count} pól'
 revision_delta_deleted: Usunięty
 revision_delta_reverted: Odwrócony
+revision_delta_update_message: To pole zostało zaktualizowane, ale jego wartość jest ukrywana ze względów bezpieczeństwa.
 revision_delta_other: Rewizja
 revision_delta_by: '{date} przez {user}'
 presentation_text_values_cannot_be_reimported: "Używa tekstu prezentacji, wartości nie mogą być ponownie zaimportowane."
@@ -476,6 +483,7 @@ creating_items: Tworzenie elementów
 enable_create_button: Włącz przycisk Utwórz
 selecting_items: Wybranie elementów
 enable_select_button: Włącz przycisk wyboru
+allow_duplicates: Zezwalaj na duplikaty
 comments: Komentarze
 no_comments: Brak komentarzy
 click_to_expand: Kliknij, aby rozwinąć
@@ -576,6 +584,9 @@ errors:
   INVALID_PAYLOAD: Błędny payload
   INVALID_PROVIDER: Użytkownik należy do innego dostawcy autoryzacji
   INVALID_QUERY: Nieprawidłowe zapytanie
+  INVALID_CONFIG: Nieprawidłowa konfiguracja
+  INVALID_TOKEN: Nieprawidłowy token
+  INVALID_IP: Adres IP niedozwolony
   INVALID_USER: Błąd uwierzytelniania użytkownika
   ITEM_LIMIT_REACHED: Osiągnięto limit przedmiotów
   ITEM_NOT_FOUND: Nie znaleziono elementu
@@ -591,6 +602,14 @@ errors:
   VALUE_OUT_OF_RANGE: Wartość jest poza zakresem
   INVALID_FOREIGN_KEY: Nieprawidłowy klucz
   UNKNOWN: Nieoczekiwany błąd
+  GRAPHQL_VALIDATION_EXCEPTION: Wyjątek sprawdzania poprawności grafiki
+  SERVICE_UNAVAILABLE: Serwis niedostępny
+  UNSUPPORTED_MEDIA_TYPE: Nie wspierany typ mediów
+  UNEXPECTED_RESPONSE: Nieoczekiwana odpowiedź
+  TOKEN_EXPIRED: Token wygasł
+  RANGE_NOT_SATISFIABLE: Błędny zakres
+  METHOD_NOT_ALLOWED: Metoda niedozwolona
+  REQUESTS_EXCEEDED: Osiągnięto limit żądań
 security: Bezpieczeństwo
 value_hashed: Wartość bezpiecznie zakodowana
 bookmark_name: Nazwa zakładki...
@@ -612,6 +631,7 @@ password_reset_sent: Jeśli masz konto to wysłaliśmy Ci bezpieczny link do zre
 password_reset_successful: Hasło zostało pomyślnie zresetowane
 back: Wstecz
 filter: Filtr
+edit_image: Edytuj obraz
 editing_image: Edycja obrazu
 square: Kwadratowy
 free: Wolne
@@ -729,6 +749,8 @@ add_file: Dodaj plik
 replace_file: Zastąp plik
 no_results: Brak wyników
 no_results_copy: Dostosuj lub wyczyść filtry wyszukiwania, aby zobaczyć wyniki.
+no_visible_fields: Pusty formularz
+no_visible_fields_copy: Ten formularz nie ma żadnych widocznych pól.
 clear_filters: Wyczyść filtry
 saves_automatically: Zapisuje automatycznie
 role: Rola
@@ -759,7 +781,7 @@ flows: Przepływy
 flow: Przepływ
 select_a_flow: Wybierz przepływ
 run_flow_on_current: Uruchom przepływ na bieżącym elemencie
-run_flow_on_selected: Brak zaznaczonych elementów | Uruchom przepływ na 1 wybranym elemencie | Uruchom przepływ na {n} wybranych elementach
+run_flow_on_current_edited_confirm: Ten przedmiot może być aktualizowany przez ten przepływ, czy na pewno chcesz go wykonać?
 run_flow_success: Przepływ "{flow}" wykonano pomyślnie
 trigger: Wyzwalacz
 trigger_options: Opcje wyzwalacza
@@ -788,6 +810,7 @@ start_flow: Rozpocznij przepływ
 stop_flow: Zatrzymaj przepływ
 create_operation: Utwórz operację
 edit_operation: Edytuj operację
+code: Kod
 operation_options: Opcje operacji
 operation_name: Nazwa operacji...
 operation_key: Identyfikator odniesienia...
@@ -831,6 +854,7 @@ media: Media
 quality: Jakość
 width: Szerokość
 height: Wysokość
+transformation_preset_key: Klucz ustawień transformacji
 source: Źródło
 url_placeholder: Wprowadź adres url...
 display_text: Wyświetl tekst
@@ -1131,6 +1155,8 @@ fields:
     transformations_all: Zezwól na wszystkie transformacje
     transformations_none: Wyłącz transformacje
     transformations_presets: Ogranicz transformacje do poniższych ustawień
+    image_editor: Edytor obrazu
+    custom_aspect_ratios: Niestandardowe proporcje
   directus_shares:
     name: Nazwa
     role: Rola
@@ -1397,6 +1423,16 @@ value: Wartość
 view_project: Zobacz projekt
 report_error: Zgłoś błąd
 start: Rozpocznij
+table: Tabela
+list: Lista
+search_filter: Szukaj i filtruj
+enable_search_filter: Włącz wyszukiwanie i filtrowanie
+item_link: Link do elementu
+show_link_to_item: Pokaż link do elementu
+navigate_to_item: Przejdź do elementu
+undo_removed_item: Cofnij usunięcie elementu
+remove_item: Usuń element
+delete_item: Usuń element
 interfaces:
   filter:
     name: Filtr
@@ -1476,6 +1512,9 @@ interfaces:
     set_to_now: Ustaw na teraz
     use_24: Użyj 24-godzinnego formatu
     placeholder: Wybierz datę...
+  system-fields:
+    select_a_collection: Wybierz kolekcje
+    no_fields: Brak pól
   system-display-template:
     display-template: Wyświetl szablon
     description: Wymieszaj wartości pola statycznego i pola dynamicznego
@@ -1532,6 +1571,7 @@ interfaces:
   list-m2m:
     many-to-many: Wiele do wielu
     description: Wybierz wiele powiązanych elementów
+    columns_configure_notice: Możesz skonfigurować kolumny po utworzeniu tego pola.
     display_template_configure_notice: Możesz skonfigurować szablon wyświetlania po utworzeniu tego pola.
   select-dropdown-m2o:
     many-to-one: Wiele do jednego
@@ -1589,6 +1629,8 @@ interfaces:
     description: Utwórz wiele wpisów o tej samej strukturze
     edit_fields: Edytuj pola
     add_label: 'Etykieta "Utwórz nowy"'
+    sort: Sortuj
+    sort_placeholder: Ręcznie
     field_name_placeholder: Wprowadź nazwę pola...
     field_note_placeholder: Wprowadź opis pola...
     incompatible_data: Bieżące dane nie są kompatybilne z interfejsem iteratora i zostaną nadpisane podczas dodawania elementów do iteratora
@@ -1643,6 +1685,9 @@ interfaces:
     display_template: Wyświetl szablon
     no_collection: Brak kolekcji
     toggle_split_view: Przełącz widok dzielony
+    enable: Włącz
+    user_language: Użyj bieżącego języka użytkownika
+    default_language: Domyślny język
     language_field: Pole identyfikacji języka
   list-o2m-tree-view:
     description: Widok drzewa dla zagnieżdżonych rekursywnych elementów od jednego do wielu
@@ -1692,6 +1737,8 @@ interfaces:
     regenerate: Wygeneruj ponownie token
     generate_success_copy: Wykonaj kopię zapasową i skopiuj token powyżej. Ze względów bezpieczeństwa nie będziesz w stanie wyświetlić tokenu ponownie po zapisaniu i opuszczeniu tej strony.
     remove_token: Usuń token
+  system-raw-editor:
+    system-raw-editor: Edycja bezpośrednia
 displays:
   translations:
     translations: Tłumaczenia
@@ -1729,6 +1776,17 @@ displays:
     short: Krótki
     relative: Względny
     relative_label: 'Pokaż czas względny, np. 5 minut temu'
+    suffix: Przyrostek
+    suffix_label: Pokaż wskaźnik względny
+    suffix_note: Używa słów takich jak 'w' i 'temu'
+    strict: Ścisły
+    strict_label: Użyj ścisłych jednostek
+    strict_note: Usuwa słowa takie jak 'prawie', 'ponad', 'mniej niż'
+    round: Zaokrąglenie
+    round_note: Wybierz sposób zaokrąglenia
+    down: Dół
+    nearest: Najbliższe
+    up: Góra
   file:
     file: Plik
     description: Wyświetl pliki
@@ -1840,33 +1898,8 @@ layouts:
     default_template: Używanie domyślnej kolekcji...
     no_compatible_fields: Brak kompatybilnych pól
   kanban:
-    name: Kanban,
-    group_field: Grupuj według,
-    group_field_placeholder: Pole do grupowania przez...,
-    group_title: Tytuł grupy,
-    group_title_placeholder: Pole dla tytułów grupy...,
-    title: Tytuł karty,
-    title_placeholder: Opcjonalne pole tytułu...,
-    text: Tekst karty,
-    text_placeholder: Opcjonalne pole tekstowe...,
-    date: Data Karty,
-    date_placeholder: Opcjonalnie pole daty...,
-    tags: Tagi karty,
-    tags_placeholder: Opcjonalne pole tagów...,
-    user: Użytkownik karty,
-    user_placeholder: Opcjonalne pole użytkownika...,
-    image: Obraz karty,
-    image_placeholder: Opcjonalne pole obrazów...,
-    image_fit: Dopasuj obraz karty,
-    crop: Przytnij,
-    advanced: Zaawansowane,
-    edit_group: Edytuj grupę,
-    delete_group: Usuń grupę,
-    add_group: Dodaj grupę,
-    add_group_placeholder: Wprowadź nowy tytuł grupy...,
-    show_ungrouped: Show Ungrouped,
-    show: Pokaż,
-    no_group: Brak Grupy,
+    crop: Przytnij
+    advanced: Zaawansowane
     not_all_loaded: Można załadować tylko pierwszych 1000 elementów.
 panels:
   metric:
@@ -1929,7 +1962,6 @@ panels:
   meter:
     description: Licznik wartości śledzenia
     name: Licznik
-    arc: Łuk
     stroke_width: Szerokość obrysu
     select_max_value: Musisz wybrać maksymalną wartość.
     max_greater_than_zero: Maksymalna wartość musi być większa niż 0.
@@ -1950,6 +1982,16 @@ panels:
     bottom: Dolny
     monochrome: Monochromatyczne
     monochrome_color: Kolor monochromatyczny
+  variable:
+    name: Zmienna globalna
+    description: Ustaw wartość globalną dla filtrów innych paneli
+    variable_key: Klucz zmienny
+  relational-variable:
+    name: Globalna Zmienna Relacyjna
+    description: Ustaw globalną wartość relacyjną dla filtrów innych paneli
+    variable_key: Klucz zmienny
+    multiple: Wielokrotność
+    multiple-label: Wybierz wiele elementów
 triggers:
   common:
     response_body: Treść odpowiedzi
@@ -1979,8 +2021,6 @@ triggers:
     collection_and_item: Strony kolekcji i rekordów
     collection_only: Tylko strona kolekcji
     item_only: Tylko strona rekordu
-a_users_uuid: Klucz główny użytkownika UUID...
-a_flow_uuid: Podstawowy UUID klucza głównego przepływu...
 any_string_or_json: Dowolny ciąg znaków lub JSON...
 item_payload_placeholder: To jest JSON używany do aktualizacji wartości pola elementu...
 operation_variables_note: Możesz uzyskać dostęp do danych przepływu zmiennymi takimi jak **{'{'}{'{'}$last{'}'}{'}'}**, **{'{'}{'{'}$trigger{'}'}{'}'}** i **{'{'}{'{'}$accountability{'}'}{'}'}**, lub odniesienie do poprzednich operacji używając **{'{'}{'{'}operation_key{'}'}{'}'}**.'
@@ -1988,6 +2028,10 @@ operations:
   condition:
     name: Warunek
     description: Trasa przepływu na podstawie logiki If / Else
+  exec:
+    name: Uruchom skrypt
+    description: Wykonaj arbitralny kod, aby zmodyfikować ładunek
+    modules: 'Następujące **Moduły Node** mogą być używane:'
   item-create:
     name: Utwórz dane
     description: Utwórz elementy w bazie danych
@@ -1996,6 +2040,7 @@ operations:
   item-delete:
     name: Usuń dane
     description: Usuń elementy w bazie danych
+    emit_events: Wydaj wydarzenia
     key: ID
     query: Zapytanie
   item-read:
@@ -2003,9 +2048,11 @@ operations:
     description: Czytaj elementy z bazy danych
     key: ID
     query: Zapytanie
+    emit_events: Wydaj wydarzenia
   item-update:
     name: Aktualizuj dane
     description: Aktualizuj elementy w bazie danych
+    emit_events: Wydaj wydarzenia
     key: ID
     payload: Ładunek
     query: Zapytanie
@@ -2022,8 +2069,9 @@ operations:
     body: Treść
   notification:
     name: Wyślij powiadomienie
-    description: Wyślij powiadomienie w aplikacji do użytkownika
+    description: Wyślij powiadomienie w aplikacji do jednego lub więcej użytkowników
     recipient: Użytkownik
+    recipient_placeholder: Dodaj UUID użytkownika i naciśnij enter...
     message: Wiadomość
   request:
     name: Webhook / URL żądania

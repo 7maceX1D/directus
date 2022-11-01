@@ -1,7 +1,8 @@
+import { parseJSON } from '@directus/shared/utils';
 import IORedis from 'ioredis';
+import type { Redis } from 'ioredis';
 import env from './env';
 import { getConfigFromEnv } from './utils/get-config-from-env';
-import { parseJSON } from './utils/parse-json';
 
 export type MessengerSubscriptionCallback = (payload: Record<string, any>) => void;
 
@@ -33,8 +34,8 @@ export class MessengerMemory implements Messenger {
 
 export class MessengerRedis implements Messenger {
 	namespace: string;
-	pub: IORedis.Redis;
-	sub: IORedis.Redis;
+	pub: Redis;
+	sub: Redis;
 
 	constructor() {
 		const config = getConfigFromEnv('MESSENGER_REDIS');
@@ -51,7 +52,7 @@ export class MessengerRedis implements Messenger {
 	subscribe(channel: string, callback: MessengerSubscriptionCallback) {
 		this.sub.subscribe(`${this.namespace}:${channel}`);
 
-		this.sub.on('message', (messageChannel, payloadString) => {
+		this.sub.on('message', (messageChannel: string, payloadString: string) => {
 			const payload = parseJSON(payloadString);
 
 			if (messageChannel === `${this.namespace}:${channel}`) {

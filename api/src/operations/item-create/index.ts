@@ -1,8 +1,7 @@
 import { Accountability, PrimaryKey } from '@directus/shared/types';
-import { defineOperationApi, toArray } from '@directus/shared/utils';
+import { defineOperationApi, optionToObject, toArray } from '@directus/shared/utils';
 import { ItemsService } from '../../services';
 import { Item } from '../../types';
-import { optionToObject } from '../../utils/operation-options';
 import { getAccountabilityForRole } from '../../utils/get-accountability-for-role';
 
 type Options = {
@@ -17,13 +16,12 @@ export default defineOperationApi<Options>({
 
 	handler: async ({ collection, payload, emitEvents, permissions }, { accountability, database, getSchema }) => {
 		const schema = await getSchema({ database });
-
 		let customAccountability: Accountability | null;
 
 		if (!permissions || permissions === '$trigger') {
 			customAccountability = accountability;
 		} else if (permissions === '$full') {
-			customAccountability = null;
+			customAccountability = await getAccountabilityForRole('system', { database, schema, accountability });
 		} else if (permissions === '$public') {
 			customAccountability = await getAccountabilityForRole(null, { database, schema, accountability });
 		} else {
@@ -43,7 +41,7 @@ export default defineOperationApi<Options>({
 		if (!payloadObject) {
 			result = null;
 		} else {
-			result = await itemsService.createMany(toArray(payloadObject), { emitEvents });
+			result = await itemsService.createMany(toArray(payloadObject), { emitEvents: !!emitEvents });
 		}
 
 		return result;

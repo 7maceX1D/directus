@@ -2,6 +2,11 @@
 
 <br />
 
+:rocket: **We're hiring Software Engineers and Project Managers**! See
+[Discussion #15048](https://github.com/directus/directus/discussions/15048) for more information.
+
+<br />
+
 ## 🐰 Introduction
 
 Directus is a real-time API and App dashboard for managing SQL database content.
@@ -115,34 +120,46 @@ team, talented contributors, and amazing [GitHub Sponsors](https://github.com/sp
 
 ## Additional Supplementary by 7MaceX1D
 
-Edited `package.json` & generate `clean` command for convenience
+Edited `package.json` & generate `clean` & `pack` commands for convenience.
 
-About `npm run dev` works
+#### Before dev or build:
 
-- `npm run build`
-  - dev mode is dependent of `dist` created by `build`
-- Initialize env and db
-  - `cd path/to/directus/api`
-  - `touch .env`
-    - fill config(db use sqlite):
-      - `KEY=""`
-      - `SECRET=""`
-      - `DB_CLIENT="sqlite3"`
-      - `DB_FILENAME="./dev.db"`
-      - `EXTENSIONS_PATH="./extensions"`
-      - `EXTENSIONS_AUTO_RELOAD=true`
-  - DB Install: `npm run cli database install`
-    - dev.db created in path/to/directus/api directory
-  - DB Migrate: `npm run cli database migrate:latest`
-  - Admin User Create:
-    - Role: `npm run cli roles create -- --role Administrator --admin`
-      - stdout print this role id (a uuid)
-    - User:
-      `npm run cli users create -- --email admin@example.com --password Admin123 --role ${the uuid of admin role printed in above command}`
-- Run
-  - Open two shells
-    - `cd path/to/directus`
-  - In one shell
-    - `npm run dev -- --scope directus`
-  - In other shell
-    - `npm run dev -- --ignore directus`
+- Install `pnpm` then `pnpm install`:
+- Install vips lib on macOS: `brew update && brew install vips` or other platforms
+- Go to pnpm sharp dependency directory `cd node_modules/.pnpm/sharp@0.xx.x/node_modules/sharp`
+  - then `pnpm install && pnpm run install`
+- Go back to workspace directory and run `pnpm install`
+
+#### Return workspace directory:
+
+- `pnpm -r build`
+  - dev mode is dependent of `dist` created by `build` for `shared` and etc. packages
+
+#### Run in Development Mode
+
+- Open two shells
+  - `cd path/to/directus`
+- In one shell
+  - `pnpm --filter directus dev`
+- In other shell
+  - `pnpm --filter @directus/app dev`
+
+#### Initialize env and db
+
+- `cd path/to/directus/api`
+- `touch .env`
+  - fill config(db use sqlite):
+    - `KEY=""`
+    - `SECRET=""`
+    - `DB_CLIENT="sqlite3"`
+    - `DB_FILENAME="./dev.db"`
+    - `EXTENSIONS_PATH="./extensions"`
+    - `EXTENSIONS_AUTO_RELOAD=true`
+- DB Install: `npm run cli database install`
+  - dev.db created in path/to/directus/api directory
+- DB Migrate: `npm run cli database migrate:latest`
+- Admin User Create:
+  - Role: `npm run cli roles create -- --role Administrator --admin`
+    - stdout print this role id (a uuid)
+  - User:
+    `npm run cli users create -- --email admin@example.com --password Admin123 --role ${the uuid of admin role printed in above command}`

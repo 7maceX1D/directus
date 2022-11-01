@@ -53,6 +53,7 @@
 				v-model="options"
 				:extension="operationType"
 				:options="operationOptions"
+				raw-editor-enabled
 				type="operation"
 			></extension-options>
 			<component
@@ -73,7 +74,7 @@ import { FlowRaw } from '@directus/shared/types';
 import slugify from '@sindresorhus/slugify';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { customAlphabet } from 'nanoid';
+import { customAlphabet } from 'nanoid/non-secure';
 
 const generateSuffix = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 5);
 
@@ -153,7 +154,9 @@ const selectedOperation = computed(() => getOperation(operationType.value));
 const generatedName = computed(() => (selectedOperation.value ? selectedOperation.value?.name : t('operation_name')));
 
 const generatedKey = computed(() =>
-	selectedOperation.value ? selectedOperation.value?.id + '_' + generateSuffix() : t('operation_key')
+	selectedOperation.value
+		? slugify(selectedOperation.value?.id + '_' + generateSuffix(), { separator: '_' })
+		: t('operation_key')
 );
 
 const { operations } = getOperations();

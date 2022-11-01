@@ -37,6 +37,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 	protected $bucket: string;
 	protected $root: string;
 	protected $acl?: string;
+	protected $serverSideEncryption?: string;
 	protected $endpointPublic?: Endpoint;
 
 	constructor(config: AmazonWebServicesS3StorageConfig) {
@@ -57,6 +58,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 		this.$bucket = config.bucket;
 		this.$root = config.root ? normalize(config.root).replace(/^\//, '') : '';
 		this.$acl = config.acl;
+		this.$serverSideEncryption = config.serverSideEncryption;
 	}
 
 	/**
@@ -78,6 +80,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 			Bucket: this.$bucket,
 			CopySource: `/${this.$bucket}/${src}`,
 			ACL: this.$acl,
+			ServerSideEncryption: this.$serverSideEncryption,
 		};
 
 		try {
@@ -271,6 +274,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 			Bucket: this.$bucket,
 			ACL: this.$acl,
 			ContentType: type ? type : '',
+			ServerSideEncryption: this.$serverSideEncryption,
 		};
 
 		try {
@@ -323,5 +327,6 @@ export interface AmazonWebServicesS3StorageConfig extends ClientConfiguration {
 	bucket: string;
 	root?: string;
 	acl?: string;
+	serverSideEncryption?: string;
 	endpointPublic?: string;
 }

@@ -131,9 +131,10 @@
 
 <script lang="ts" setup>
 import api from '@/api';
-import { Sort } from '@/components/v-table/types';
+import { Sort, Header } from '@/components/v-table/types';
 import { router } from '@/router';
-import { useFlowsStore, usePermissionsStore } from '@/stores';
+import { useFlowsStore } from '@/stores/flows';
+import { usePermissionsStore } from '@/stores/permissions';
 import { unexpectedError } from '@/utils/unexpected-error';
 import { FlowRaw } from '@directus/shared/types';
 import { computed, ref, Ref } from 'vue';
@@ -170,29 +171,40 @@ const conditionalFormatting = ref([
 	},
 ]);
 
-const tableHeaders = [
+const tableHeaders = ref<Header[]>([
 	{
 		text: '',
 		value: 'icon',
 		width: 42,
 		sortable: false,
+		align: 'left',
+		description: null,
 	},
 	{
 		text: t('status'),
 		value: 'status',
 		width: 100,
+		sortable: true,
+		align: 'left',
+		description: null,
 	},
 	{
 		text: t('name'),
 		value: 'name',
 		width: 240,
+		sortable: true,
+		align: 'left',
+		description: null,
 	},
 	{
 		text: t('description'),
 		value: 'description',
 		width: 360,
+		sortable: false,
+		align: 'left',
+		description: null,
 	},
-];
+]);
 
 const internalSort: Ref<Sort> = ref({ by: 'name', desc: false });
 

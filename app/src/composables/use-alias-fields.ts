@@ -3,7 +3,7 @@ import { Query } from '@directus/shared/types';
 import { computed, ComputedRef, Ref } from 'vue';
 import { merge } from 'lodash';
 
-type AliasField = {
+export type AliasField = {
 	fieldName: string;
 	fieldAlias: string;
 	fullAlias: string;
@@ -19,7 +19,7 @@ type UsableAliasFields = {
 	};
 };
 
-export default function useAliasFields(fields: Ref<string[]>): UsableAliasFields {
+export function useAliasFields(fields: Ref<string[]>): UsableAliasFields {
 	const aliasFields = computed(() => {
 		if (!fields.value || fields.value.length === 0) return null;
 

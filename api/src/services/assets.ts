@@ -1,4 +1,5 @@
 import { Range, StatResponse } from '@directus/drive';
+import { Accountability } from '@directus/shared/types';
 import { Semaphore } from 'async-mutex';
 import { Knex } from 'knex';
 import { contentType } from 'mime-types';
@@ -7,21 +8,13 @@ import path from 'path';
 import sharp from 'sharp';
 import getDatabase from '../database';
 import env from '../env';
-import { IllegalAssetTransformation, RangeNotSatisfiableException, ForbiddenException } from '../exceptions';
+import { ForbiddenException, IllegalAssetTransformation, RangeNotSatisfiableException } from '../exceptions';
+import logger from '../logger';
 import storage from '../storage';
-import {
-	AbstractServiceOptions,
-	File,
-	Transformation,
-	TransformationParams,
-	TransformationPreset,
-	TransformationPresetResize,
-} from '../types';
-import { Accountability } from '@directus/shared/types';
+import { AbstractServiceOptions, File, Transformation, TransformationParams, TransformationPreset } from '../types';
 import { AuthorizationService } from './authorization';
 import * as TransformationUtils from '../utils/transformations';
 import validateUUID from 'uuid-validate';
-import { URLSearchParams } from 'url';
 
 sharp.concurrency(1);
 
@@ -158,9 +151,16 @@ export class AssetsService {
 				const transformer = sharp({
 					limitInputPixels: Math.pow(env.ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION, 2),
 					sequentialRead: true,
-				}).rotate();
+				});
+
+				if (transforms.find((transform) => transform[0] === 'rotate') === undefined) transformer.rotate();
 
 				transforms.forEach(([method, ...args]) => (transformer[method] as any).apply(transformer, args));
+
+				readStream.on('error', (e) => {
+					logger.error(e, `Couldn't transform file ${file.id}`);
+					readStream.unpipe(transformer);
+				});
 
 				await storage.disk(file.storage).put(assetFilename, readStream.pipe(transformer), type);
 

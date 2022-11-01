@@ -10,6 +10,8 @@ import env from '../../env';
 import { respond } from '../../middleware/respond';
 import { COOKIE_OPTIONS } from '../../constants';
 import { getIPFromReq } from '../../utils/get-ip-from-req';
+import { performance } from 'perf_hooks';
+import { stall } from '../../utils/stall';
 import logger from '../../logger';
 import ms from 'ms';
 
@@ -56,9 +58,13 @@ export function createLocalAuthRouter(provider: string): Router {
 	router.post(
 		'/',
 		asyncHandler(async (req, res, next) => {
+			const STALL_TIME = env.LOGIN_STALL_TIME;
+			const timeStart = performance.now();
+
 			const accountability = {
 				ip: getIPFromReq(req),
 				userAgent: req.get('user-agent'),
+				origin: req.get('origin'),
 				role: null,
 			};
 
@@ -70,6 +76,7 @@ export function createLocalAuthRouter(provider: string): Router {
 			const { error } = userLoginSchema.validate(req.body);
 
 			if (error) {
+				await stall(STALL_TIME, timeStart);
 				throw new InvalidPayloadException(error.message);
 			}
 
