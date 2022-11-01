@@ -76,3 +76,86 @@ function redactQuery(originalPath: string) {
 
 	return url.pathname + url.search;
 }
+
+// edited by @7macex1d
+// add file logger by log4js, as follow:
+import path from 'path';
+import log4js from 'log4js';
+import express from 'express';
+let log4jsHTTPLogger: log4js.Logger;
+export class FileLogger {
+	static initLog4js(): boolean {
+		const logRoot = loggerEnvConfig.destinationRoot
+			? loggerEnvConfig.destinationRoot.startsWith('/')
+				? (loggerEnvConfig.destinationRoot as string)
+				: process.cwd()
+				? process.cwd() + `/${loggerEnvConfig.destinationRoot}`
+				: ''
+			: '';
+		if (!logRoot) return false;
+
+		const httpLogFile = path.resolve(logRoot + '/v1/http.log');
+
+		log4js.configure({
+			appenders: {
+				console: { type: 'console' },
+				http: {
+					type: 'file',
+					filename: httpLogFile,
+					layout: {
+						type: 'pattern',
+						pattern: '[%d{yyyy-MM-ddThh:mm:ss.SSS}] [%p] %c - [%h - PID:%z] --- %m',
+					},
+					alwaysIncludePattern: true,
+					pattern: 'yyyy-MM-dd',
+					daysTokeep: 7,
+					backups: 3,
+					keepFileExt: true,
+				},
+			},
+			categories: {
+				default: { appenders: ['console'], level: 'info' },
+				http: { appenders: ['http'], level: 'all' },
+			},
+		});
+
+		log4jsHTTPLogger = log4js.getLogger('http');
+		return !!log4jsHTTPLogger;
+	}
+
+	static getHttpLogger(): express.Handler | undefined {
+		if (!log4jsHTTPLogger) return undefined;
+
+		// parse regex
+		// \[([^]]+)] \[(\w+)] (\w+) - \[(\S+) - PID:(\d+)] --- (\S+) (\S+) - (\d+)ms - "(\S+) (\d+) (\w+) ([^"]+)" "([^"]*)" "([^"]*)"
+		return log4js.connectLogger(log4jsHTTPLogger, {
+			level: 'auto',
+			statusRules: [
+				{ from: 200, to: 399, level: 'info' },
+				{ from: 400, to: 599, level: 'error' },
+			],
+			// include the Express request ID in the logs
+			format: (req: express.Request, res: express.Response, format) => {
+				const apiModule = (
+					req.originalUrl.split('//').length <= 1 ? req.originalUrl.split('/')[1] : req.originalUrl.split('/')[2]
+				).split('?')[0];
+				const currentUser = ''; // TODO!
+				return format(
+					[
+						// eslint-disable-next-line prettier/prettier
+						':remote-addr',
+						currentUser || ':remote-user',
+						'-',
+						':response-timems',
+						'-',
+						apiModule || '',
+						'"HTTP/:http-version :status :method :url"',
+						'":referrer"',
+						'":user-agent"',
+					].join(' ')
+				);
+			},
+			nolog: '\\.(ico|gif|jpe?g|png|svg|woff2?|otf|ttf)',
+		});
+	}
+}

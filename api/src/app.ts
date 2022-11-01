@@ -41,7 +41,7 @@ import env from './env';
 import { InvalidPayloadException } from './exceptions';
 import { getExtensionManager } from './extensions';
 import { getFlowManager } from './flows';
-import logger, { expressLogger } from './logger';
+import logger, { expressLogger, FileLogger } from './logger';
 import authenticate from './middleware/authenticate';
 import getPermissions from './middleware/get-permissions';
 import cache from './middleware/cache';
@@ -143,6 +143,9 @@ export default async function createApp(): Promise<express.Application> {
 	await emitter.emitInit('middlewares.before', { app });
 
 	app.use(expressLogger);
+
+	// add file logger by @7macex1d
+	FileLogger.initLog4js() && app.use(FileLogger.getHttpLogger()!);
 
 	app.use((_req, res, next) => {
 		res.setHeader('X-Powered-By', 'Directus');
