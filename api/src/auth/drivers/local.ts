@@ -82,7 +82,7 @@ export function createLocalAuthRouter(provider: string): Router {
 
 			const mode = req.body.mode || 'json';
 
-			const { accessToken, refreshToken, expires } = await authenticationService.login(
+			const { accessToken, refreshToken, expires, id } = await authenticationService.login(
 				provider,
 				req.body,
 				req.body?.otp
@@ -92,6 +92,7 @@ export function createLocalAuthRouter(provider: string): Router {
 				data: { access_token: accessToken, expires },
 			} as Record<string, Record<string, any>>;
 
+			// added by 7macex1d for access cookie sync
 			if (env.ACCESS_TOKEN_COOKIE_ENABLE) {
 				res.cookie(env.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
 					httpOnly: true,
@@ -101,6 +102,17 @@ export function createLocalAuthRouter(provider: string): Router {
 				});
 				logger.info(
 					`AUTH: Access Token is set in Cookie -> ${env.ACCESS_TOKEN_COOKIE_NAME} of ${env.ACCESS_TOKEN_COOKIE_DOMAIN} in ${env.ACCESS_TOKEN_TTL}`
+				);
+			}
+			if (env.USER_ID_COOKIE_ENABLE) {
+				res.cookie(env.USER_ID_COOKIE_NAME, id, {
+					httpOnly: true,
+					domain: env.USER_ID_COOKIE_DOMAIN,
+					maxAge: ms(env.USER_ID_TTL as string),
+					secure: env.USER_ID_COOKIE_SECURE ?? false,
+				});
+				logger.info(
+					`AUTH: User ID is set in Cookie -> ${env.USER_ID_COOKIE_NAME} of ${env.USER_ID_COOKIE_DOMAIN} in ${env.USER_ID_TTL}`
 				);
 			}
 

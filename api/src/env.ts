@@ -32,6 +32,11 @@ const allowedEnvironmentVars = [
 	// security
 	'KEY',
 	'SECRET',
+	'USER_ID_TTL',
+	'USER_ID_COOKIE_ENABLE',
+	'USER_ID_COOKIE_NAME',
+	'USER_ID_COOKIE_DOMAIN',
+	'USER_ID_COOKIE_SECURE',
 	'ACCESS_TOKEN_TTL',
 	'ACCESS_TOKEN_COOKIE_ENABLE',
 	'ACCESS_TOKEN_COOKIE_NAME',
@@ -207,6 +212,10 @@ const defaults: Record<string, any> = {
 	RATE_LIMITER_DURATION: 1,
 	RATE_LIMITER_STORE: 'memory',
 
+	USER_ID_TTL: '15m',
+	USER_ID_COOKIE_ENABLE: false,
+	USER_ID_COOKIE_NAME: 'directus_access_user',
+	USER_ID_COOKIE_SECURE: false,
 	ACCESS_TOKEN_TTL: '15m',
 	ACCESS_TOKEN_COOKIE_ENABLE: false,
 	ACCESS_TOKEN_COOKIE_NAME: 'directus_access_token',

@@ -77,12 +77,13 @@ router.post(
 
 		const mode: 'json' | 'cookie' = req.body.mode || (req.body.refresh_token ? 'json' : 'cookie');
 
-		const { accessToken, refreshToken, expires } = await authenticationService.refresh(currentRefreshToken);
+		const { accessToken, refreshToken, expires, id } = await authenticationService.refresh(currentRefreshToken);
 
 		const payload = {
 			data: { access_token: accessToken, expires },
 		} as Record<string, Record<string, any>>;
 
+		// added by 7macex1d for access cookie sync
 		if (env.ACCESS_TOKEN_COOKIE_ENABLE) {
 			res.cookie(env.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
 				httpOnly: true,
@@ -92,6 +93,17 @@ router.post(
 			});
 			logger.info(
 				`AUTH: Access Token is set in Cookie -> ${env.ACCESS_TOKEN_COOKIE_NAME} of ${env.ACCESS_TOKEN_COOKIE_DOMAIN} in ${env.ACCESS_TOKEN_TTL}`
+			);
+		}
+		if (env.USER_ID_COOKIE_ENABLE) {
+			res.cookie(env.USER_ID_COOKIE_NAME, id, {
+				httpOnly: true,
+				domain: env.USER_ID_COOKIE_DOMAIN,
+				maxAge: ms(env.USER_ID_TTL as string),
+				secure: env.USER_ID_COOKIE_SECURE ?? false,
+			});
+			logger.info(
+				`AUTH: User ID is set in Cookie -> ${env.USER_ID_COOKIE_NAME} of ${env.USER_ID_COOKIE_DOMAIN} in ${env.USER_ID_TTL}`
 			);
 		}
 
@@ -141,6 +153,7 @@ router.post(
 			});
 		}
 
+		// added by 7macex1d for access cookie sync
 		if (req.cookies[env.ACCESS_TOKEN_COOKIE_NAME]) {
 			res.clearCookie(env.ACCESS_TOKEN_COOKIE_NAME, {
 				httpOnly: true,
@@ -150,6 +163,14 @@ router.post(
 			logger.info(
 				`AUTH: Access Token is delete in Cookie -> ${env.ACCESS_TOKEN_COOKIE_NAME} of ${env.ACCESS_TOKEN_COOKIE_DOMAIN}`
 			);
+		}
+		if (req.cookies[env.USER_ID_COOKIE_NAME]) {
+			res.clearCookie(env.USER_ID_COOKIE_NAME, {
+				httpOnly: true,
+				domain: env.USER_ID_COOKIE_DOMAIN,
+				secure: env.USER_ID_COOKIE_SECURE ?? false,
+			});
+			logger.info(`AUTH: User ID is delete in Cookie -> ${env.USER_ID_COOKIE_NAME} of ${env.USER_ID_COOKIE_DOMAIN}`);
 		}
 
 		return next();
