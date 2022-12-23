@@ -1,5 +1,6 @@
 import formatTitle from '@directus/format-title';
 import axios, { AxiosResponse } from 'axios';
+import { Semaphore } from 'async-mutex';
 import exifr from 'exifr';
 import { clone, pick } from 'lodash';
 import { extension } from 'mime-types';
@@ -19,6 +20,11 @@ import { ItemsService } from './items';
 import net from 'net';
 import os from 'os';
 import encodeURL from 'encodeurl';
+import { SYSTEM_ASSET_ALLOW_LIST } from '../constants';
+
+// added by 7macex1d for limit large size image to storage
+sharp.concurrency(1);
+const semaphore = new Semaphore(env.ASSETS_TRANSFORM_MAX_CONCURRENT);
 
 const lookupDNS = promisify(lookup);
 
@@ -90,6 +96,46 @@ export class FilesService extends ItemsService {
 			payload.title ??= title;
 			payload.tags ??= tags;
 			payload.metadata ??= metadata;
+
+			// added by 7macex1d for aliyun image process limit 20MiB
+			// filesize >= 20MiB, 20971520
+			if (
+				env.ASSETS_IMAGE_UPLOAD_OPTIMIZED_FILESIZE &&
+				payload.filesize >= env.ASSETS_IMAGE_UPLOAD_OPTIMIZED_FILESIZE
+			) {
+				if (
+					width &&
+					height &&
+					width <= env.ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION &&
+					height <= env.ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION
+				) {
+					const optimizedTransforms = SYSTEM_ASSET_ALLOW_LIST.filter((t) => t.key == '.storage-optimized')?.at(0);
+					if (optimizedTransforms?.transforms) {
+						const assetFilename =
+							path.basename(payload.filename_disk!, path.extname(payload.filename_disk!)) +
+							'.' +
+							(optimizedTransforms.suffix ?? 'storage-optimized') +
+							path.extname(payload.filename_disk!);
+
+						await semaphore.runExclusive(async () => {
+							const readStream = storage.disk(data.storage).getStream(payload.filename_disk!);
+							const transformer = sharp({
+								limitInputPixels: Math.pow(env.ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION, 2),
+								sequentialRead: true,
+							}).rotate();
+
+							optimizedTransforms.transforms!.forEach(([method, ...args]) =>
+								(transformer[method] as any).apply(transformer, args)
+							);
+
+							await storage.disk(data.storage).put(assetFilename, readStream.pipe(transformer), payload.type!);
+
+							const url = storage.disk(data.storage).getUrl(assetFilename);
+							logger.info(`Transform a large image(${payload.filename_disk}) to optimize: ${url}`);
+						});
+					}
+				}
+			}
 		}
 
 		// We do this in a service without accountability. Even if you don't have update permissions to the file,

@@ -4,6 +4,12 @@ import ms from 'ms';
 
 export const SYSTEM_ASSET_ALLOW_LIST: TransformationParams[] = [
 	{
+		// added by 7macex1d for aliyun image process limit 20MiB
+		key: '.storage-optimized',
+		transforms: [['resize', { width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true }]],
+		suffix: 'storage-optimized',
+	},
+	{
 		key: 'system-small-cover',
 		transforms: [['resize', { width: 64, height: 64, fit: 'cover' }]],
 	},

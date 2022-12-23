@@ -113,7 +113,7 @@ export class AssetsService {
 
 			const assetFilename =
 				path.basename(file.filename_disk, path.extname(file.filename_disk)) +
-				getAssetSuffix(transforms) +
+				getAssetSuffix(transforms, transformation.suffix) +
 				(maybeNewFormat ? `.${maybeNewFormat}` : path.extname(file.filename_disk));
 
 			const { exists } = await storage.disk(file.storage).exists(assetFilename);
@@ -229,7 +229,7 @@ export class AssetsService {
 
 				const assetFilename =
 					path.basename(file.filename_disk, path.extname(file.filename_disk)) +
-					getAssetSuffix(transforms) +
+					getAssetSuffix(transforms, transformation.suffix) +
 					(maybeNewFormat ? `.${maybeNewFormat}` : path.extname(file.filename_disk));
 
 				const { exists } = await storage.disk(file.storage).exists(assetFilename);
@@ -284,8 +284,11 @@ export class AssetsService {
 	}
 }
 
-const getAssetSuffix = (transforms: Transformation[]) => {
+// added by 7macex1d for aliyun image process limit 20MiB
+// use custom suffix
+const getAssetSuffix = (transforms: Transformation[], suffix?: string) => {
 	if (Object.keys(transforms).length === 0) return '';
+	if (suffix) return `.${suffix}`;
 	return `__${hash(transforms)}`;
 };
 

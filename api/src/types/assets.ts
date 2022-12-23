@@ -67,6 +67,7 @@ export type Transformation = TransformationMap[keyof TransformationMap];
 export type TransformationParams = {
 	key?: string;
 	transforms?: Transformation[];
+	suffix?: string;
 };
 
 // Transformation preset is defined in the admin UI.
