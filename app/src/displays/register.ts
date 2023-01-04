@@ -14,7 +14,7 @@ export async function registerDisplays(app: App): Promise<void> {
 			? await import('@directus-extensions-display')
 			: await import(/* @vite-ignore */ `${getRootPath()}extensions/displays/index.js`);
 
-		displays.push(...customDisplays.default);
+		if (customDisplays?.default) displays.push(...customDisplays.default);
 	} catch (err: any) {
 		// eslint-disable-next-line no-console
 		console.warn(`Couldn't load custom displays`);

@@ -15,7 +15,7 @@ export async function registerPanels(app: App): Promise<void> {
 			? await import('@directus-extensions-panel')
 			: await import(/* @vite-ignore */ `${getRootPath()}extensions/panels/index.js`);
 
-		panels.push(...customPanels.default);
+		if (customPanels?.default) panels.push(...customPanels.default);
 	} catch (err: any) {
 		// eslint-disable-next-line no-console
 		console.warn(`Couldn't load custom panels`);

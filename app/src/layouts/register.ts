@@ -15,7 +15,7 @@ export async function registerLayouts(app: App): Promise<void> {
 			? await import('@directus-extensions-layout')
 			: await import(/* @vite-ignore */ `${getRootPath()}extensions/layouts/index.js`);
 
-		layouts.push(...customLayouts.default);
+		if (customLayouts?.default) layouts.push(...customLayouts.default);
 	} catch (err: any) {
 		// eslint-disable-next-line no-console
 		console.warn(`Couldn't load custom layouts`);

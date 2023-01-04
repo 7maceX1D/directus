@@ -15,7 +15,7 @@ export async function registerOperations(app: App): Promise<void> {
 			? await import('@directus-extensions-operation')
 			: await import(/* @vite-ignore */ `${getRootPath()}extensions/operations/index.js`);
 
-		operations.push(...customOperations.default);
+		if (customOperations?.default) operations.push(...customOperations.default);
 	} catch (err: any) {
 		// eslint-disable-next-line no-console
 		console.warn(`Couldn't load custom operations`);

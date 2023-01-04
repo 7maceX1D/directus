@@ -15,7 +15,7 @@ export async function registerInterfaces(app: App): Promise<void> {
 			? await import('@directus-extensions-interface')
 			: await import(/* @vite-ignore */ `${getRootPath()}extensions/interfaces/index.js`);
 
-		interfaces.push(...customInterfaces.default);
+		if (customInterfaces?.default) interfaces.push(...customInterfaces.default);
 	} catch (err: any) {
 		// eslint-disable-next-line no-console
 		console.warn(`Couldn't load custom interfaces`);
