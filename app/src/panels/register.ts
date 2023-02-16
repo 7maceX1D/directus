@@ -13,7 +13,7 @@ export async function registerPanels(app: App): Promise<void> {
 	try {
 		const customPanels: { default: PanelConfig[] } = import.meta.env.DEV
 			? await import('@directus-extensions-panel')
-			: await import(/* @vite-ignore */ `${getRootPath()}extensions/panels/index.js`);
+			: await import(/* @vite-ignore */ `${window.location.origin + getRootPath()}extensions/panels/index.js`);
 
 		if (customPanels?.default) panels.push(...customPanels.default);
 	} catch (err: any) {

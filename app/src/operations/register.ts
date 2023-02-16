@@ -13,7 +13,7 @@ export async function registerOperations(app: App): Promise<void> {
 	try {
 		const customOperations: { default: OperationAppConfig[] } = import.meta.env.DEV
 			? await import('@directus-extensions-operation')
-			: await import(/* @vite-ignore */ `${getRootPath()}extensions/operations/index.js`);
+			: await import(/* @vite-ignore */ `${window.location.origin + getRootPath()}extensions/operations/index.js`);
 
 		if (customOperations?.default) operations.push(...customOperations.default);
 	} catch (err: any) {

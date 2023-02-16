@@ -28,7 +28,14 @@
 		<template v-else>
 			<div class="actions">
 				<v-button v-tooltip="t('click_to_browse')" icon rounded secondary @click="openFileBrowser">
-					<input ref="input" class="browse" type="file" :multiple="multiple" @input="onBrowseSelect" />
+					<input
+						ref="input"
+						class="browse"
+						type="file"
+						:accept="acceptMimetype"
+						:multiple="multiple"
+						@input="onBrowseSelect"
+					/>
 					<v-icon name="file_upload" />
 				</v-button>
 				<v-button
@@ -102,6 +109,7 @@ interface Props {
 	fromUrl?: boolean;
 	fromLibrary?: boolean;
 	folder?: string;
+	acceptMimetype?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -111,6 +119,7 @@ const props = withDefaults(defineProps<Props>(), {
 	fromUrl: false,
 	fromLibrary: false,
 	folder: undefined,
+	acceptMimetype: '*',
 });
 
 const emit = defineEmits(['input']);

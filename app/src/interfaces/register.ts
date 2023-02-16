@@ -13,7 +13,7 @@ export async function registerInterfaces(app: App): Promise<void> {
 	try {
 		const customInterfaces: { default: InterfaceConfig[] } = import.meta.env.DEV
 			? await import('@directus-extensions-interface')
-			: await import(/* @vite-ignore */ `${getRootPath()}extensions/interfaces/index.js`);
+			: await import(/* @vite-ignore */ `${window.location.origin + getRootPath()}extensions/interfaces/index.js`);
 
 		if (customInterfaces?.default) interfaces.push(...customInterfaces.default);
 	} catch (err: any) {

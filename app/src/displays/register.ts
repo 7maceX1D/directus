@@ -12,7 +12,7 @@ export async function registerDisplays(app: App): Promise<void> {
 	try {
 		const customDisplays: { default: DisplayConfig[] } = import.meta.env.DEV
 			? await import('@directus-extensions-display')
-			: await import(/* @vite-ignore */ `${getRootPath()}extensions/displays/index.js`);
+			: await import(/* @vite-ignore */ `${window.location.origin + getRootPath()}extensions/displays/index.js`);
 
 		if (customDisplays?.default) displays.push(...customDisplays.default);
 	} catch (err: any) {

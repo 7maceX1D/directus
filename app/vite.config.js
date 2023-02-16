@@ -157,6 +157,20 @@ export default defineConfig({
 	test: {
 		environment: 'happy-dom',
 	},
+	build: {
+		minify: false,
+	},
+	experimental: {
+		renderBuiltUrl(filename /*, { hostId, hostType }*/) {
+			// console.log('filename: ', filename, hostId, hostType);
+			if (process.env.NODE_ENV === 'production' && process.env.ASSETS_CDN_BASEURL && filename.startsWith('assets/')) {
+				if (process.env.ASSETS_CDN_BASEURL.endsWith('/')) return process.env.ASSETS_CDN_BASEURL + filename;
+				else return process.env.ASSETS_CDN_BASEURL + '/' + filename;
+			} else {
+				return { relative: true };
+			}
+		},
+	},
 });
 
 function getExtensionsRealPaths() {

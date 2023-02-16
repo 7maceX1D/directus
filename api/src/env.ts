@@ -109,6 +109,7 @@ const allowedEnvironmentVars = [
 	'FILE_METADATA_ALLOW_LIST',
 	// assets
 	'ASSETS_CACHE_TTL',
+	'ASSETS_CDN_BASEURL', // added by 7macex1d for cdn support
 	'ASSETS_USE_REMOTE_TRANSFORMER', // added by 7macex1d for aliyun transformer
 	'ASSETS_TRANSFORM_MAX_CONCURRENT',
 	'ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION',

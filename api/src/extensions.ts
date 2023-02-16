@@ -296,6 +296,9 @@ class ExtensionManager {
 		}));
 
 		const bundles: Partial<Record<AppExtensionType | HybridExtensionType, string>> = {};
+		// console.log('APP_SHARED_DEPS: ', APP_SHARED_DEPS);
+		// console.log('sharedDepsMapping: ', sharedDepsMapping);
+		// console.log('internalImports: ', internalImports);
 
 		for (const extensionType of APP_OR_HYBRID_EXTENSION_TYPES) {
 			const entry = generateExtensionsEntry(extensionType, this.extensions);
@@ -331,8 +334,11 @@ class ExtensionManager {
 
 			if (depName) {
 				const depUrl = new Url(env.PUBLIC_URL).addPath('admin', 'assets', depName);
-
-				depsMapping[dep] = depUrl.toString({ rootRelative: true });
+				let depUrlString = depUrl.toString({ rootRelative: true });
+				if (env.ASSETS_CDN_BASEURL) {
+					depUrlString = env.ASSETS_CDN_BASEURL + depUrlString.slice(env.ASSETS_CDN_BASEURL.endsWith('/') ? 1 : 0);
+				}
+				depsMapping[dep] = depUrlString;
 			} else {
 				logger.warn(`Couldn't find shared extension dependency "${dep}"`);
 			}
